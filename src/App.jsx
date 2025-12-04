@@ -8,6 +8,8 @@ import AddExpenseForm from './components/AddExpenseForm';
 import RecentTransactions from './components/RecentTransactions';
 import CategoryChart from './components/CategoryChart';
 import TransactionsView from './components/TransactionsView';
+import AIChatWindow from './components/AIChatWindow';
+import Toast from './components/Toast';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -17,9 +19,16 @@ export default function App() {
   const [monthlyExpenses, setMonthlyExpenses] = useState([]);
   
   const [currentView, setCurrentView] = useState('dashboard');
-  
-  // ✅ NEW STATE: Selected Month (Format: "YYYY-MM")
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // ✅ DAY 28: Mobile Menu State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
 
   // --- AUTH SETUP ---
   useEffect(() => {
@@ -34,29 +43,21 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // --- BUDGET LISTENER ---
+  // --- LISTENERS ---
   useEffect(() => {
     if (user) {
       const budgetRef = doc(db, COLLECTIONS.BUDGETS, user.uid);
       const unsubscribe = onSnapshot(budgetRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setBudgetLimit(docSnap.data().limit);
-        } else {
-          setBudgetLimit(0);
-        }
+        if (docSnap.exists()) setBudgetLimit(docSnap.data().limit);
       });
       return () => unsubscribe();
     }
   }, [user]);
 
-  // --- DYNAMIC EXPENSES LISTENER ---
   useEffect(() => {
     if (user) {
-      // ✅ LOGIC UPDATE: Use selectedMonth to calculate start/end dates
-      // selectedMonth is "2024-12"
       const [year, month] = selectedMonth.split('-');
       const startOfMonth = `${selectedMonth}-01`;
-      // Calculate last day of that month
       const lastDay = new Date(year, month, 0).getDate(); 
       const endOfMonth = `${selectedMonth}-${lastDay}`;
 
@@ -69,15 +70,12 @@ export default function App() {
       );
 
       const unsubscribe = onSnapshot(q, (snapshot) => {
-        const fetched = snapshot.docs.map(doc => ({
-           id: doc.id,
-           ...doc.data()
-        }));
+        const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setMonthlyExpenses(fetched);
       });
       return () => unsubscribe();
     }
-  }, [user, selectedMonth]); // ✅ Re-run when selectedMonth changes
+  }, [user, selectedMonth]);
 
   // --- CALCULATIONS ---
   const totalSpent = monthlyExpenses.reduce((total, item) => total + (parseFloat(item.amount) || 0), 0);
@@ -107,8 +105,10 @@ export default function App() {
         userId: user.uid,
         updatedAt: new Date().toISOString()
       }, { merge: true });
+      showToast("Budget updated!", "success");
     } catch (error) {
       console.error("Error saving budget:", error);
+      showToast("Failed to save budget.", "error");
     }
   };
 
@@ -137,9 +137,10 @@ export default function App() {
       );
       const expensesRef = collection(db, COLLECTIONS.EXPENSES);
       await addDoc(expensesRef, newExpense);
+      showToast("Transaction added!", "success");
     } catch (error) {
       console.error("Error adding expense:", error);
-      alert("❌ Failed to save transaction");
+      showToast("Failed to add transaction.", "error");
     }
   };
 
@@ -147,25 +148,25 @@ export default function App() {
     if (!confirm("Delete this transaction?")) return;
     try {
       await deleteDoc(doc(db, COLLECTIONS.EXPENSES, expenseId));
+      showToast("Transaction deleted.", "info");
     } catch (error) {
       console.error("Error deleting expense:", error);
+      showToast("Failed to delete.", "error");
     }
   };
 
-  // ✅ NEW HANDLER: Bulk Delete
   const handleBulkDelete = async (idsToDelete) => {
     try {
-        // Firestore Batch (Delete multiple at once)
         const batch = writeBatch(db);
         idsToDelete.forEach(id => {
             const docRef = doc(db, COLLECTIONS.EXPENSES, id);
             batch.delete(docRef);
         });
         await batch.commit();
-        alert(`Successfully deleted ${idsToDelete.length} transactions.`);
+        showToast(`Deleted ${idsToDelete.length} transactions.`, "info");
     } catch (error) {
         console.error("Error deleting expenses:", error);
-        alert("Failed to delete selection.");
+        showToast("Bulk delete failed.", "error");
     }
   };
 
@@ -174,9 +175,11 @@ export default function App() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
+      showToast("Welcome back!", "success");
     } catch (error) {
       console.error("Login failed:", error);
       setIsLoggingIn(false);
+      showToast("Login failed.", "error");
     }
   };
 
@@ -185,14 +188,20 @@ export default function App() {
     setBudgetLimit(0);
     setMonthlyExpenses([]);
     setCurrentView('dashboard');
+    showToast("Logged out successfully.", "info");
+  };
+
+  const handleNavClick = (view) => {
+    setCurrentView(view);
+    setIsMobileMenuOpen(false); // Close menu on click
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;
 
   if (!user) {
-    // LOGIN SCREEN
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         <div className="bg-white shadow-xl rounded-2xl w-full max-w-sm p-8 text-center border border-gray-100">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🔒</div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Expense Tracker</h1>
@@ -205,9 +214,38 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-sans overflow-hidden">
       
-      {/* SIDEBAR */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
+      {/* ✅ MOBILE MENU OVERLAY */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-gray-900/50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+          
+          {/* Drawer Container */}
+          <div 
+            className="fixed inset-y-0 left-0 w-64 bg-white p-4 flex flex-col shadow-2xl animate-slide-right" 
+            onClick={e => e.stopPropagation()}
+          >
+             <div className="h-16 flex items-center px-2 mb-4 border-b border-gray-100">
+                <span className="text-xl font-bold text-blue-600">💰 Tracker</span>
+                <button className="ml-auto text-gray-500 hover:text-red-500 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>✕</button>
+             </div>
+             
+             <nav className="space-y-2">
+                <button onClick={() => handleNavClick('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${currentView === 'dashboard' ? 'bg-blue-50 text-blue-700' : 'text-gray-600'}`}>📊 Dashboard</button>
+                <button onClick={() => handleNavClick('transactions')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium ${currentView === 'transactions' ? 'bg-blue-50 text-blue-700' : 'text-gray-600'}`}>📝 Transactions</button>
+                <button onClick={() => { setIsChatOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">🤖 AI Advisor</button>
+             </nav>
+             
+             <div className="mt-auto pt-4 border-t border-gray-100">
+                <button onClick={handleLogout} className="w-full text-red-500 font-bold py-2 hover:bg-red-50 rounded-xl transition-colors">Sign Out</button>
+             </div>
+          </div>
+        </div>
+      )}
+
+      {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col z-10">
         <div className="h-16 flex items-center px-6 border-b border-gray-100">
           <span className="text-xl font-bold text-blue-600">💰 Tracker</span>
@@ -219,7 +257,7 @@ export default function App() {
           <button onClick={() => setCurrentView('transactions')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors ${currentView === 'transactions' ? 'bg-blue-50 text-blue-700' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}>
             <span>📝</span> Transactions
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 hover:text-gray-600 rounded-xl font-medium transition-colors">
+          <button onClick={() => setIsChatOpen(true)} className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-50 hover:text-gray-600 rounded-xl font-medium transition-colors">
             <span>🤖</span> AI Advisor
           </button>
         </nav>
@@ -234,21 +272,21 @@ export default function App() {
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-screen relative">
+        {/* ✅ MOBILE HEADER (With Hamburger) */}
         <header className="md:hidden h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-20">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700">☰</button>
           <span className="text-lg font-bold text-blue-600">💰 Tracker</span>
-          <button onClick={handleLogout} className="text-sm text-gray-500">Log Out</button>
+          <div className="w-8"></div> {/* Spacer for centering */}
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
           <div className="max-w-6xl mx-auto space-y-8">
-            
             <div className="flex justify-between items-end">
               <div className="ml-4">
                 <h2 className="text-2xl font-bold text-gray-800">{currentView === 'dashboard' ? 'Dashboard' : 'Transactions'}</h2>
                 <p className="text-gray-500">{currentView === 'dashboard' ? 'Overview of your finances' : 'Manage your expenses'}</p>
               </div>
               <span className="text-sm text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
-                {/* Display selected month name */}
                 {new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
               </span>
             </div>
@@ -290,7 +328,6 @@ export default function App() {
                 <TransactionsView 
                     expenses={monthlyExpenses} 
                     onDelete={handleDeleteExpense} 
-                    // ✅ NEW PROPS
                     onBulkDelete={handleBulkDelete}
                     selectedMonth={selectedMonth}
                     onMonthChange={setSelectedMonth}
@@ -298,6 +335,17 @@ export default function App() {
             )}
           </div>
         </main>
+
+        <AIChatWindow 
+          isOpen={isChatOpen} 
+          onClose={() => setIsChatOpen(false)}
+          onToggle={() => setIsChatOpen(!isChatOpen)}
+          financialData={{
+            budget: budgetLimit,
+            totalSpent: totalSpent,
+            expenses: monthlyExpenses
+          }}
+        />
       </div>
     </div>
   );
