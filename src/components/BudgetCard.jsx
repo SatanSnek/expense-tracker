@@ -49,7 +49,7 @@ export default function BudgetCard({ initialBudget = 0, spent = 0, onSave }) {
           ) : (
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-3xl font-bold text-gray-800">
-                ${parseFloat(amount).toLocaleString()}
+                ₹{parseFloat(amount).toLocaleString()}
               </span>
               <span className="text-sm text-gray-400">/ month</span>
             </div>
@@ -73,7 +73,7 @@ export default function BudgetCard({ initialBudget = 0, spent = 0, onSave }) {
         <p className="text-xs text-gray-400">
             {spent > initialBudget ? '⚠️ Budget Exceeded' : percentageText}
         </p>
-        <p className="text-xs font-bold text-gray-500">${spent.toLocaleString()} spent</p>
+        <p className="text-xs font-bold text-gray-500">₹{spent.toLocaleString()} spent</p>
       </div>
     </div>
   );

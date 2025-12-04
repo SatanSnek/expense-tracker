@@ -83,7 +83,7 @@ export default function CategoryChart({ expenses = [] }) {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-white rounded-full flex items-center justify-center shadow-inner">
              <div className="text-center">
                <span className="block text-xs text-gray-400 font-bold uppercase">Total</span>
-               <span className="text-xl font-bold text-gray-800">${totalValue.toLocaleString()}</span>
+               <span className="text-xl font-bold text-gray-800">₹{totalValue.toLocaleString()}</span>
              </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function CategoryChart({ expenses = [] }) {
                 <span className="text-gray-600 font-medium">{cat.name}</span>
               </div>
               <div className="text-right">
-                <span className="font-bold text-gray-800">${cat.value.toLocaleString()}</span>
+                <span className="font-bold text-gray-800">₹{cat.value.toLocaleString()}</span>
                 <span className="text-xs text-gray-400 ml-2">
                   {((cat.value / totalValue) * 100).toFixed(0)}%
                 </span>

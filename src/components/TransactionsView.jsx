@@ -173,7 +173,7 @@ export default function TransactionsView({
                     {expense.description || '-'}
                   </td>
                   <td className="px-6 py-4 text-right font-bold text-gray-800">
-                    ${parseFloat(expense.amount).toFixed(2)}
+                    ₹{parseFloat(expense.amount).toFixed(2)}
                   </td>
                   <td className="px-6 py-4 text-center">
                     <button 

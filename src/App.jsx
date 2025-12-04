@@ -81,7 +81,9 @@ export default function App() {
   const totalSpent = monthlyExpenses.reduce((total, item) => total + (parseFloat(item.amount) || 0), 0);
   const remainingBudget = budgetLimit - totalSpent;
 
-  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
   const dailySpent = monthlyExpenses
     .filter(item => item.date === today)
     .reduce((total, item) => total + (parseFloat(item.amount) || 0), 0);
@@ -287,7 +289,13 @@ export default function App() {
                 <p className="text-gray-500">{currentView === 'dashboard' ? 'Overview of your finances' : 'Manage your expenses'}</p>
               </div>
               <span className="text-sm text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
-                {new Date(selectedMonth + "-01").toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                {/* ✅ UPDATED: Shows "Friday, December 5, 2025" */}
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
               </span>
             </div>
 
@@ -296,22 +304,22 @@ export default function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                             <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Total Spent</p>
-                            <h3 className="text-2xl font-bold text-gray-800">${totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                            <h3 className="text-2xl font-bold text-gray-800">₹{totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
                             <p className="text-xs text-gray-400 mt-2">This Month</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                             <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Remaining</p>
-                            <h3 className={`text-2xl font-bold ${remainingBudget < 0 ? 'text-red-500' : 'text-gray-800'}`}>${remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                            <h3 className={`text-2xl font-bold ${remainingBudget < 0 ? 'text-red-500' : 'text-gray-800'}`}>₹{remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
                             <p className="text-xs text-gray-400 mt-2">{remainingBudget < 0 ? '⚠️ Over Budget' : 'Available'}</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                             <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Today</p>
-                            <h3 className="text-2xl font-bold text-gray-800">${dailySpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                            <h3 className="text-2xl font-bold text-gray-800">₹{dailySpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
                             <p className="text-xs text-gray-400 mt-2">Daily Total</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                             <p className="text-gray-500 text-xs uppercase font-bold tracking-wider mb-1">Last 7 Days</p>
-                            <h3 className="text-2xl font-bold text-gray-800">${weeklySpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
+                            <h3 className="text-2xl font-bold text-gray-800">₹{weeklySpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
                             <p className="text-xs text-gray-400 mt-2">Rolling Total</p>
                         </div>
                     </div>

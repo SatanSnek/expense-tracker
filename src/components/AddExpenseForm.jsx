@@ -30,7 +30,7 @@ export default function AddExpenseForm({ onSave }) {
         {/* Row 1: Amount & Date */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Amount ($)</label>
+            <label className="block text-xs font-medium text-gray-700 mb-1">Amount (₹)</label>
             <input
               type="number"
               required

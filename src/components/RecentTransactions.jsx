@@ -81,7 +81,7 @@ export default function RecentTransactions({ userId }) {
             </div>
             
             <div className="text-right">
-              <span className="font-bold text-gray-800 block">-${parseFloat(expense.amount).toFixed(2)}</span>
+              <span className="font-bold text-gray-800 block">-₹{parseFloat(expense.amount).toFixed(2)}</span>
               <span className="text-xs text-gray-400">{expense.date}</span>
             </div>
           </div>

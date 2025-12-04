@@ -27,13 +27,13 @@ export default function AIChatWindow({ isOpen, onClose, onToggle, financialData 
     });
     
     const categoryText = Object.entries(catTotals)
-      .map(([cat, val]) => `${cat}: $${val.toFixed(2)}`)
+      .map(([cat, val]) => `${cat}: ₹${val.toFixed(2)}`)
       .join(', ');
 
     return `
-      Current Month Budget: $${budget}
-      Total Spent So Far: $${totalSpent.toFixed(2)}
-      Remaining: $${(budget - totalSpent).toFixed(2)}
+      Current Month Budget: ₹${budget}
+      Total Spent So Far: ₹${totalSpent.toFixed(2)}
+      Remaining: ₹${(budget - totalSpent).toFixed(2)}
       Spending Breakdown by Category: ${categoryText}
       Recent Transactions Count: ${expenses.length}
     `;
@@ -78,7 +78,7 @@ export default function AIChatWindow({ isOpen, onClose, onToggle, financialData 
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col z-50 overflow-hidden animate-fade-in-up">
+    <div className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 w-full h-full sm:w-96 sm:h-[500px] bg-white sm:rounded-2xl shadow-2xl border border-gray-100 flex flex-col z-[60] overflow-hidden animate-fade-in-up">
       <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">🤖</div>
