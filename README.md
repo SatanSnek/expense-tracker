@@ -1,10 +1,10 @@
-💰 AI Expense Tracker
+# 💰 AI Expense Tracker
 
 A modern, responsive expense tracking application built to help users manage their finances. This project demonstrates a full-stack integration using React for the frontend and Google Firebase for backend services (Authentication & Database).
 
-🚀 Features
+## 🚀 Features
 
- Google Authentication: Secure login/logout functionality using Firebase Auth.
+ **Google Authentication:** Secure login/logout functionality using Firebase Auth.
 
  Real-time Database: Data persistence using Cloud Firestore (In Progress).
 
@@ -25,6 +25,7 @@ Follow these steps to run the project locally.
 
 1. Clone the repository
 
+```
 git clone https://github.com/YOUR_USERNAME/expense-tracker.git
 cd expense-tracker
 
@@ -43,10 +44,11 @@ Enable Cloud Firestore (Database).
 Create a file named src/firebaseConfig.js and paste your credentials:
 
 JavaScript
-
+```
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+```
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
