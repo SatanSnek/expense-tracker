@@ -31,20 +31,19 @@ cd expense-tracker
 ```
 
 2. Install Dependencies
-
+```
 npm install
-
+```
 3. Configure Firebase
 
-Create a project at Firebase Console.
+  Create a project at Firebase Console.
 
-Enable Authentication (Google Provider).
+  Enable Authentication (Google Provider).
 
-Enable Cloud Firestore (Database).
+  Enable Cloud Firestore (Database).
 
-Create a file named src/firebaseConfig.js and paste your credentials:
+  Create a file named src/firebaseConfig.js and paste your credentials:
 
-JavaScript
 ```
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
@@ -65,25 +64,24 @@ export const db = getFirestore(app);
 ```
 
 4. Run the App
-
-npm run dev
-
+```
+ npm run dev
+```
 Open http://localhost:5173 in your browser.
 
 .
 
 ## 📅 Development Roadmap
-[x] Day 1: UI Shell & Tailwind Setup
+[x] Day 1-2: Setup & Config
 
-[x] Day 2: Firebase Configuration & Connection
+[x] Day 3-4: Auth UI & Logic
 
-[x] Day 3: Google Authentication
+[x] Day 5: Data Models
 
-[ ] Day 4: Adding Transactions (CRUD Operations)
+[x] Day 6: User Database Persistence
 
-[ ] Day 5: Real-time Updates & Deletion
+[x] Day 7: Responsive Layout
 
-[ ] Day 6: Deployment
 
 ## 🤝 Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
