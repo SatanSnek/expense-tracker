@@ -1,16 +1,86 @@
-# React + Vite
+💰 AI Expense Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive expense tracking application built to help users manage their finances. This project demonstrates a full-stack integration using React for the frontend and Google Firebase for backend services (Authentication & Database).
 
-Currently, two official plugins are available:
+🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+ Google Authentication: Secure login/logout functionality using Firebase Auth.
 
-## React Compiler
+ Real-time Database: Data persistence using Cloud Firestore (In Progress).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+ Responsive UI: Fully adaptive design using Tailwind CSS.
 
-## Expanding the ESLint configuration
+ Dynamic Dashboard: Personalized user view with profile integration.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🛠️ Tech Stack
+
+ Frontend: React (Vite), Tailwind CSS
+
+ Backend: Firebase (Authentication, Firestore)
+
+ Language: JavaScript (ES6+)
+
+⚙️ Setup & Installation
+Follow these steps to run the project locally.
+
+1. Clone the repository
+
+git clone https://github.com/YOUR_USERNAME/expense-tracker.git
+cd expense-tracker
+
+2. Install Dependencies
+
+npm install
+
+3. Configure Firebase
+
+Create a project at Firebase Console.
+
+Enable Authentication (Google Provider).
+
+Enable Cloud Firestore (Database).
+
+Create a file named src/firebaseConfig.js and paste your credentials:
+
+JavaScript
+
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+4. Run the App
+
+npm run dev
+
+Open http://localhost:5173 in your browser.
+
+.
+
+📅 Development Roadmap
+[x] Day 1: UI Shell & Tailwind Setup
+
+[x] Day 2: Firebase Configuration & Connection
+
+[x] Day 3: Google Authentication
+
+[ ] Day 4: Adding Transactions (CRUD Operations)
+
+[ ] Day 5: Real-time Updates & Deletion
+
+[ ] Day 6: Deployment
+
+🤝 Contributing
+Contributions are welcome! Feel free to fork the repository and submit a pull request.
