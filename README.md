@@ -6,21 +6,21 @@ A modern, responsive expense tracking application built to help users manage the
 
  **Google Authentication:** Secure login/logout functionality using Firebase Auth.
 
- Real-time Database: Data persistence using Cloud Firestore (In Progress).
+ **Real-time Database:** Data persistence using Cloud Firestore (In Progress).
 
- Responsive UI: Fully adaptive design using Tailwind CSS.
+ **Responsive UI:** Fully adaptive design using Tailwind CSS.
 
- Dynamic Dashboard: Personalized user view with profile integration.
+ **Dynamic Dashboard:** Personalized user view with profile integration.
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
- Frontend: React (Vite), Tailwind CSS
+ **Frontend:** React (Vite), Tailwind CSS
 
- Backend: Firebase (Authentication, Firestore)
+ **Backend:** Firebase (Authentication, Firestore)
 
- Language: JavaScript (ES6+)
+ **Language:** JavaScript (ES6+)
 
-⚙️ Setup & Installation
+## ⚙️ Setup & Installation
 Follow these steps to run the project locally.
 
 1. Clone the repository
@@ -28,6 +28,7 @@ Follow these steps to run the project locally.
 ```
 git clone https://github.com/YOUR_USERNAME/expense-tracker.git
 cd expense-tracker
+```
 
 2. Install Dependencies
 
@@ -48,7 +49,6 @@ JavaScript
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-```
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -62,6 +62,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+```
 
 4. Run the App
 
@@ -71,7 +72,7 @@ Open http://localhost:5173 in your browser.
 
 .
 
-📅 Development Roadmap
+## 📅 Development Roadmap
 [x] Day 1: UI Shell & Tailwind Setup
 
 [x] Day 2: Firebase Configuration & Connection
@@ -84,5 +85,5 @@ Open http://localhost:5173 in your browser.
 
 [ ] Day 6: Deployment
 
-🤝 Contributing
+## 🤝 Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
