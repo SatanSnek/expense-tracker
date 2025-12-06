@@ -25,14 +25,14 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // ✅ THEME STATE: 'default', 'nebula', or 'cherry'
+  // Theme State
   const [theme, setTheme] = useState('default');
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
 
-  // --- AUTH & LISTENERS (Standard Logic) ---
+  // --- AUTH & LISTENERS ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -87,8 +87,8 @@ export default function App() {
   const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
   const weeklySpent = monthlyExpenses.filter(item => item.date >= sevenDaysAgoStr && item.date <= today).reduce((total, item) => total + (parseFloat(item.amount) || 0), 0);
 
-  // --- HANDLERS (Standard) ---
-  const handleSaveBudget = async (newAmount) => { /* ... */ try { await setDoc(doc(db, COLLECTIONS.BUDGETS, user.uid), { limit: newAmount, userId: user.uid, updatedAt: new Date().toISOString() }, { merge: true }); showToast("Budget updated!", "success"); } catch (error) { showToast("Failed.", "error"); } };
+  // --- HANDLERS ---
+  const handleSaveBudget = async (newAmount) => { try { await setDoc(doc(db, COLLECTIONS.BUDGETS, user.uid), { limit: newAmount, userId: user.uid, updatedAt: new Date().toISOString() }, { merge: true }); showToast("Budget updated!", "success"); } catch (error) { showToast("Failed.", "error"); } };
   const saveUserToFirestore = async (user) => { try { const userRef = doc(db, COLLECTIONS.USERS, user.uid); const snap = await getDoc(userRef); if (!snap.exists()) await setDoc(userRef, createUserModel(user)); } catch (error) { console.error(error); } };
   const handleAddExpense = async (formData) => { if (!user) return; try { await addDoc(collection(db, COLLECTIONS.EXPENSES), createExpenseModel(user.uid, formData.amount, formData.category, formData.description, formData.date)); showToast("Added!", "success"); } catch (error) { showToast("Failed.", "error"); } };
   const handleDeleteExpense = async (id) => { if (confirm("Delete?")) { try { await deleteDoc(doc(db, COLLECTIONS.EXPENSES, id)); showToast("Deleted.", "info"); } catch (error) { showToast("Failed.", "error"); } } };
@@ -101,29 +101,31 @@ export default function App() {
   if (!user) return <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4"><button onClick={handleGoogleLogin} className="bg-blue-600 text-white px-6 py-3 rounded-xl">Sign in with Google</button></div>;
 
   // --- 🎨 THEME LOGIC ---
-  // 1. Determine if we are in "Dark/Glass" mode (Nebula or Cherry)
-  const isDarkTheme = theme === 'nebula' || theme === 'cherry';
+  // Any of these themes trigger "Dark Mode" behavior in children
+  const isDarkTheme = theme === 'nebula' || theme === 'cherry' || theme === 'midnight';
 
-  // 2. Select the specific Background Gradient
+  // Background Gradients
   let appBgClass = 'bg-gradient-to-br from-gray-50 to-blue-50 text-gray-800'; // Default
   if (theme === 'nebula') appBgClass = 'bg-gradient-to-br from-indigo-950 via-purple-900 to-fuchsia-900 text-white';
-  if (theme === 'cherry') appBgClass = 'bg-gradient-to-br from-pink-600 via-purple-600 to-yellow-400 text-white'; // ✅ Cherry Gradient
+  if (theme === 'cherry') appBgClass = 'bg-gradient-to-br from-pink-600 via-purple-600 to-yellow-400 text-white';
+  if (theme === 'midnight') appBgClass = 'bg-gradient-to-br from-gray-900 via-emerald-950 to-black text-white'; // ✅ Midnight Green
 
-  // 3. Styles that depend on Dark Mode
   const sidebarClass = isDarkTheme ? 'bg-black/20 border-white/10 backdrop-blur-lg' : 'bg-white border-gray-200';
+  
+  // Reusable card style
   const cardClass = `p-6 rounded-2xl shadow-sm border transition-all duration-300 ${isDarkTheme ? 'bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl' : 'bg-white border-gray-100 text-gray-800'}`;
   const textMuted = isDarkTheme ? 'text-white/60' : 'text-gray-400';
   const textHeading = isDarkTheme ? 'text-white' : 'text-gray-800';
 
   return (
-    // ✅ TRICK: We pass 'nebula' to data-theme if it's cherry, so the children components (cards) use the glass effect automatically!
+    // We pass 'nebula' to data-theme if it's ANY dark theme, so children use the glass styles
     <div data-theme={isDarkTheme ? 'nebula' : 'default'} className={`group flex h-screen font-sans overflow-hidden transition-colors duration-500 ${appBgClass}`}>
       
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 bg-gray-900/50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className={`fixed inset-y-0 left-0 w-64 p-4 flex flex-col shadow-2xl animate-slide-right ${isDarkTheme ? 'bg-indigo-900 text-white' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
+          <div className={`fixed inset-y-0 left-0 w-64 p-4 flex flex-col shadow-2xl animate-slide-right ${isDarkTheme ? 'bg-gray-900 text-white' : 'bg-white'}`} onClick={e => e.stopPropagation()}>
              <div className="h-16 flex items-center px-2 mb-4 border-b border-white/10">
                 <span className="text-xl font-bold">💰 Tracker</span>
                 <button className="ml-auto opacity-70" onClick={() => setIsMobileMenuOpen(false)}>✕</button>
@@ -143,7 +145,6 @@ export default function App() {
         <div className={`h-16 flex items-center px-6 border-b ${isDarkTheme ? 'border-white/10' : 'border-gray-100'}`}>
           <span className={`text-xl font-bold ${isDarkTheme ? 'text-white' : 'text-blue-600'}`}>💰 Tracker</span>
         </div>
-        
         <nav className="flex-1 p-4 space-y-2">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -167,13 +168,12 @@ export default function App() {
             <span>🤖</span> AI Advisor
           </button>
         </nav>
-
         <div className={`p-4 border-t ${isDarkTheme ? 'border-white/10' : 'border-gray-100'}`}>
            <div className="flex items-center gap-3 px-2 mb-4">
               {user.photoURL && <img src={user.photoURL} referrerPolicy="no-referrer" alt="User" className="w-8 h-8 rounded-full border-2 border-white/50" />}
               <span className={`text-sm font-bold truncate w-32 ${isDarkTheme ? 'text-white' : 'text-gray-700'}`}>{user.displayName}</span>
            </div>
-           <button onClick={handleLogout} className={`w-full text-xs font-semibold text-center ${isDarkTheme ? 'text-red-300 hover:text-red-200' : 'text-red-500 hover:text-red-700'}`}>Sign Out</button>
+           <button onClick={handleLogout} className="w-full text-xs text-red-400 hover:text-red-300 font-semibold text-center">Sign Out</button>
         </div>
       </aside>
 

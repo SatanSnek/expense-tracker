@@ -57,13 +57,13 @@ export default function TransactionsView({
     `}>
       
       {/* TOOLBAR */}
-      <div className="p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center 
+      <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center 
         bg-gray-50 group-data-[theme=nebula]:bg-white/5 group-data-[theme=nebula]:border-white/10">
         
-        <div className="flex items-center gap-4 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
           <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap group-data-[theme=nebula]:text-white">Transactions</h2>
           <select value={selectedMonth} onChange={(e) => onMonthChange(e.target.value)}
-            className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2
+            className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-auto p-2
             group-data-[theme=nebula]:bg-white/10 group-data-[theme=nebula]:border-white/20 group-data-[theme=nebula]:text-white group-data-[theme=nebula]:*:bg-slate-800"
           >
             {months.map(m => (
@@ -72,9 +72,9 @@ export default function TransactionsView({
           </select>
         </div>
         
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
             {selectedIds.size > 0 && (
-                <button onClick={executeBulkDelete} className="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 transition-colors flex items-center gap-2">
+                <button onClick={executeBulkDelete} className="w-full sm:w-auto bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-200 transition-colors flex items-center justify-center gap-2">
                 <span>🗑️</span> Delete ({selectedIds.size})
                 </button>
             )}
@@ -88,8 +88,8 @@ export default function TransactionsView({
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-x-auto">
+      {/* ✅ DESKTOP VIEW (Table) - Hidden on Mobile */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider
@@ -104,7 +104,7 @@ export default function TransactionsView({
           </thead>
           <tbody className="divide-y divide-gray-100 group-data-[theme=nebula]:divide-white/10">
             {sortedExpenses.length === 0 ? (
-              <tr><td colSpan="6" className="px-6 py-8 text-center text-gray-400 group-data-[theme=nebula]:text-blue-200">No transactions found for this month.</td></tr>
+              <tr><td colSpan="6" className="px-6 py-8 text-center text-gray-400 group-data-[theme=nebula]:text-blue-200">No transactions found.</td></tr>
             ) : (
               sortedExpenses.map((expense) => (
                 <tr key={expense.id} className={`hover:bg-blue-50 transition-colors group-data-[theme=nebula]:hover:bg-white/5 ${selectedIds.has(expense.id) ? 'bg-blue-50 group-data-[theme=nebula]:bg-indigo-900/50' : ''}`}>
@@ -120,6 +120,45 @@ export default function TransactionsView({
           </tbody>
         </table>
       </div>
+
+      {/* ✅ MOBILE VIEW (Cards) - Hidden on Desktop */}
+      <div className="md:hidden p-4 space-y-4">
+        {sortedExpenses.length === 0 ? (
+          <div className="text-center text-gray-400 group-data-[theme=nebula]:text-blue-200 py-8">No transactions found.</div>
+        ) : (
+          sortedExpenses.map((expense) => (
+            <div 
+              key={expense.id} 
+              className={`p-4 rounded-xl border transition-colors 
+                ${selectedIds.has(expense.id) 
+                  ? 'bg-blue-50 border-blue-200 group-data-[theme=nebula]:bg-white/10 group-data-[theme=nebula]:border-white/30' 
+                  : 'bg-white border-gray-100 group-data-[theme=nebula]:bg-transparent group-data-[theme=nebula]:border-white/10'}
+              `}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex items-center gap-3">
+                  <input type="checkbox" checked={selectedIds.has(expense.id)} onChange={() => handleSelectOne(expense.id)} className="rounded border-gray-300 text-blue-600" />
+                  <div>
+                    <span className="block text-sm font-bold text-gray-700 group-data-[theme=nebula]:text-white">{expense.category}</span>
+                    <span className="text-xs text-gray-400 group-data-[theme=nebula]:text-blue-200">{new Date(expense.date).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <span className="text-lg font-bold text-gray-800 group-data-[theme=nebula]:text-white">₹{parseFloat(expense.amount).toFixed(2)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center pt-2 border-t border-gray-100 group-data-[theme=nebula]:border-white/10">
+                <span className="text-sm text-gray-500 group-data-[theme=nebula]:text-gray-400 truncate max-w-[200px]">
+                  {expense.description || 'No description'}
+                </span>
+                <button onClick={() => onDelete(expense.id)} className="text-gray-400 hover:text-red-500 p-1">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
     </div>
   );
 }

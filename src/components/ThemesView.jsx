@@ -12,12 +12,18 @@ export default function ThemesView({ currentTheme, onThemeChange }) {
       colors: 'bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900',
       preview: 'bg-indigo-900'
     },
-    // ✅ NEW THEME
     {
       id: 'cherry',
       name: 'Cherry Sunset',
       colors: 'bg-gradient-to-br from-pink-600 via-purple-600 to-yellow-400',
       preview: 'bg-pink-600'
+    },
+    // ✅ NEW THEME: Midnight Green
+    {
+      id: 'midnight',
+      name: 'Midnight Green',
+      colors: 'bg-gradient-to-br from-gray-900 via-green-900 to-black',
+      preview: 'bg-green-900'
     }
   ];
 
