@@ -18,7 +18,7 @@ export default function AIChatWindow({ isOpen, onClose, onToggle, financialData 
   const generateContextString = () => {
     if (!financialData) return "No financial data available.";
 
-    const { budget, totalSpent, expenses } = financialData;
+    const { budget, totalSpent, expenses, dailySpent } = financialData;
     
     // Group expenses by category for summary
     const catTotals = {};
@@ -34,6 +34,7 @@ export default function AIChatWindow({ isOpen, onClose, onToggle, financialData 
       Current Month Budget: ₹${budget}
       Total Spent So Far: ₹${totalSpent.toFixed(2)}
       Remaining: ₹${(budget - totalSpent).toFixed(2)}
+      Spent Today: ₹${dailySpent ? dailySpent.toFixed(2) : "0.00"}
       Spending Breakdown by Category: ${categoryText}
       Recent Transactions Count: ${expenses.length}
     `;
