@@ -2,7 +2,11 @@
 
 // ⚠️ SECURITY WARNING: In a real production app, never store keys in code!
 // For this learning project, it is fine, but don't publish this to public GitHub.
-const API_KEY = "AIzaSyB1csP9OOT-YyC8gmEm3vPUzhk-LcRlg8E"; 
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!API_KEY) {
+  console.error("Missing API Key! Make sure VITE_GEMINI_API_KEY is set in .env");
+}
 
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
 
