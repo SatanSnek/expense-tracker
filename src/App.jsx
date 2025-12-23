@@ -11,6 +11,7 @@ import TransactionsView from './components/TransactionsView';
 import AIChatWindow from './components/AIChatWindow';
 import Toast from './components/Toast';
 import ThemesView from './components/ThemesView';
+import { Capacitor } from '@capacitor/core';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -97,13 +98,19 @@ export default function App() {
     setIsLoggingIn(true);
     const provider = new GoogleAuthProvider();
     try {
-      // ✅ USE REDIRECT INSTEAD OF POPUP
-      await signInWithRedirect(auth, provider);
-      // The app will now leave this page and go to Google...
+      // ✅ SMART CHECK: 
+      // If we are on a Phone (Native), use Redirect.
+      // If we are on a PC (Web), use Popup.
+      if (Capacitor.isNativePlatform()) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        await signInWithPopup(auth, provider);
+        showToast("Welcome back!", "success");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setIsLoggingIn(false);
-      showToast("Login failed.", "error");
+      showToast("Login failed. Try again.", "error");
     }
   };
   useEffect(() => {
