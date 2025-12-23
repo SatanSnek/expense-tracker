@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <!-- Replace 'host' with your actual authDomain from firebaseConfig.js -->
+                <data android:scheme="https" android:host="expense-tracker-eaef1.firebaseapp.com" android:pathPrefix="/__/auth/callback"/>
+            </intent-filter>
+
         </activity>
 
         <provider

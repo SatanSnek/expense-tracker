@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut, signInWithRedirect, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { doc, setDoc, getDoc, onSnapshot, addDoc, collection, query, where, deleteDoc, writeBatch } from 'firebase/firestore'; 
 import { auth, db } from './firebaseConfig'; 
 import { createUserModel, createExpenseModel, COLLECTIONS } from './models'; 
@@ -93,7 +93,34 @@ export default function App() {
   const handleAddExpense = async (formData) => { if (!user) return; try { await addDoc(collection(db, COLLECTIONS.EXPENSES), createExpenseModel(user.uid, formData.amount, formData.category, formData.description, formData.date)); showToast("Added!", "success"); } catch (error) { showToast("Failed.", "error"); } };
   const handleDeleteExpense = async (id) => { if (confirm("Delete?")) { try { await deleteDoc(doc(db, COLLECTIONS.EXPENSES, id)); showToast("Deleted.", "info"); } catch (error) { showToast("Failed.", "error"); } } };
   const handleBulkDelete = async (ids) => { try { const batch = writeBatch(db); ids.forEach(id => batch.delete(doc(db, COLLECTIONS.EXPENSES, id))); await batch.commit(); showToast(`Deleted ${ids.length}.`, "info"); } catch (error) { showToast("Failed.", "error"); } };
-  const handleGoogleLogin = async () => { setIsLoggingIn(true); try { await signInWithPopup(auth, new GoogleAuthProvider()); showToast("Welcome!", "success"); } catch (error) { setIsLoggingIn(false); showToast("Login failed.", "error"); } };
+  const handleGoogleLogin = async () => {
+    setIsLoggingIn(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      // ✅ USE REDIRECT INSTEAD OF POPUP
+      await signInWithRedirect(auth, provider);
+      // The app will now leave this page and go to Google...
+    } catch (error) {
+      console.error("Login failed:", error);
+      setIsLoggingIn(false);
+      showToast("Login failed.", "error");
+    }
+  };
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          showToast("Welcome back!", "success");
+          // The main onAuthStateChanged listener will handle the rest
+        }
+      } catch (error) {
+        console.error("Redirect login error:", error);
+        setIsLoggingIn(false);
+      }
+    };
+    checkRedirect();
+  }, []);
   const handleLogout = () => { signOut(auth); setBudgetLimit(0); setMonthlyExpenses([]); setCurrentView('dashboard'); showToast("Logged out.", "info"); };
   const handleNavClick = (view) => { setCurrentView(view); setIsMobileMenuOpen(false); };
 
