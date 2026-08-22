@@ -8,7 +8,7 @@ if (!API_KEY) {
   console.error("Missing API Key! Make sure VITE_GEMINI_API_KEY is set in .env");
 }
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
 export const fetchGeminiResponse = async (userMessage, context = "") => {
   try {
@@ -45,7 +45,8 @@ export const fetchGeminiResponse = async (userMessage, context = "") => {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      const errorBody = await response.text();
+      throw new Error(`API Error ${response.status}: ${errorBody}`);
     }
 
     const data = await response.json();
@@ -55,7 +56,7 @@ export const fetchGeminiResponse = async (userMessage, context = "") => {
     return aiText || "Sorry, I didn't understand that.";
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    console.error("Gemini API Error:", error.message);
     return "I am having trouble connecting to the brain right now. Try again later.";
   }
 };

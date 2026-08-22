@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "expense-tracker-eaef1"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }
